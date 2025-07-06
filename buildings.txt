@@ -1,0 +1,3 @@
+name,cost,hp
+home,0,100
+wall,2,10
