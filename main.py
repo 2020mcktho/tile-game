@@ -69,10 +69,11 @@ class World:
 
         self.camera_pos = np.array((0., 0.))
 
+    def get_world_pos(self, screen_pos: np.ndarray):
+        return (screen_pos - screen_size / 2) / tile_size
 
-
-    def get_chunk_in(self, pos: np.ndarray, create_new_chunk: bool = False):
-        chunk_in_pos = get_chunk_in_pos(pos)
+    def get_chunk_in(self, world_pos: np.ndarray, create_new_chunk: bool = False):
+        chunk_in_pos = get_chunk_in_pos(world_pos)
         chunk_key = get_chunk_key(chunk_in_pos)
 
         if chunk_key in self.chunks:
@@ -95,7 +96,7 @@ class World:
         # display the chunks around the camera position
         chunk = self.get_chunk_in(self.camera_pos, create_new_chunk=True)
         if chunk is not None:
-            new_offset = -np.multiply(self.camera_pos, tile_size) + np.array(screen.get_size()) / 2
+            new_offset = -np.multiply(self.camera_pos, tile_size) + screen_size / 2
             chunk.display(screen, new_offset)
 
 
@@ -104,8 +105,7 @@ def main():
     world = World()
 
     pygame.init()
-    dims = (500, 500)
-    screen = pygame.display.set_mode(dims)
+    screen = pygame.display.set_mode(screen_size)
     clock = pygame.time.Clock()
     fps = 60
 
@@ -115,6 +115,11 @@ def main():
         dt = clock.tick(fps) / 1000
 
         keys = pygame.key.get_pressed()
+
+        mouse_pos = np.array(pygame.mouse.get_pos())
+        game_pos = world.get_world_pos(mouse_pos)
+
+        print(game_pos)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
