@@ -17,6 +17,10 @@ def get_chunk_in_pos(pos: np.ndarray):
     return np.floor_divide(pos, chunk_dims)
 
 
+def get_world_pos(screen_pos: np.ndarray):
+    return (screen_pos - screen_size / 2) / tile_size
+
+
 class Tile:
     def __init__(self, pos: np.ndarray, building: (None|Building)=None):
         self.pos = pos
@@ -69,9 +73,6 @@ class World:
 
         self.camera_pos = np.array((0., 0.))
 
-    def get_world_pos(self, screen_pos: np.ndarray):
-        return (screen_pos - screen_size / 2) / tile_size
-
     def get_chunk_in(self, world_pos: np.ndarray, create_new_chunk: bool = False):
         chunk_in_pos = get_chunk_in_pos(world_pos)
         chunk_key = get_chunk_key(chunk_in_pos)
@@ -117,7 +118,7 @@ def main():
         keys = pygame.key.get_pressed()
 
         mouse_pos = np.array(pygame.mouse.get_pos())
-        game_pos = world.get_world_pos(mouse_pos)
+        game_pos = get_world_pos(mouse_pos)
 
         print(game_pos)
 
