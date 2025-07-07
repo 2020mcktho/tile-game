@@ -1,4 +1,5 @@
 import numpy as np
+import pygame
 
 tile_size = 30
 camera_speed = 2.

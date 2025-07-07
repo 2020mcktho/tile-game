@@ -1,5 +1,3 @@
-import numpy as np
-import pygame
 import os
 
 from settings import *

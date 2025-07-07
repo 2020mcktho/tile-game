@@ -1,6 +1,3 @@
-import numpy as np
-import pygame
-
 from buildings import Building
 from settings import *
 
@@ -45,7 +42,7 @@ class Tile:
 
 class Chunk:
     def __init__(self, chunk_pos: np.ndarray):
-        self.chunk_pos = chunk_pos  # position in the world of the topleft of the chunk, not chunk position
+        self.chunk_pos = chunk_pos  # position in the world of the top left of the chunk, not chunk position
 
         top_left_pos = np.multiply(self.chunk_pos, chunk_dims)
 
@@ -159,7 +156,7 @@ def main():
 
         # display the selected boxes
         for pos in selected_boxes:
-            pos2 = -world.camera_pos + (pos[0] * tile_size, pos[1]* tile_size) + half_screen
+            pos2 = (-world.camera_pos + pos) * tile_size + half_screen
             rect = pygame.Rect(pos2, (tile_size, tile_size))
             pygame.draw.rect(screen, (0, 0, 255), rect, 5)
 
