@@ -18,7 +18,7 @@ def get_chunk_in_pos(pos: np.ndarray):
 
 
 def get_world_pos(screen_pos: np.ndarray):
-    return (screen_pos - screen_size / 2) / tile_size
+    return (screen_pos - half_screen) / tile_size
 
 
 class Tile:
@@ -97,7 +97,7 @@ class World:
         # display the chunks around the camera position
         chunk = self.get_chunk_in(self.camera_pos, create_new_chunk=True)
         if chunk is not None:
-            new_offset = -np.multiply(self.camera_pos, tile_size) + screen_size / 2
+            new_offset = -np.multiply(self.camera_pos, tile_size) + half_screen
             chunk.display(screen, new_offset)
 
 
@@ -110,6 +110,9 @@ def main():
     clock = pygame.time.Clock()
     fps = 60
 
+    click_down_pos = None
+    selected_boxes = []
+
     running = True
     while running:
 
@@ -120,11 +123,18 @@ def main():
         mouse_pos = np.array(pygame.mouse.get_pos())
         game_pos = get_world_pos(mouse_pos)
 
-        print(game_pos)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # left click down: set the mouse down position
+                    click_down_pos = np.floor(game_pos)
+                elif event.button == 3:  # right click down: reset click position and selected boxes
+                    click_down_pos = None
+                    selected_boxes.clear()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:  # left click release: reset the click down pos
+                    click_down_pos = None
 
         if keys[pygame.K_w]:
             world.camera_pos[1] -= camera_speed * dt
@@ -135,10 +145,24 @@ def main():
         if keys[pygame.K_d]:
             world.camera_pos[0] += camera_speed * dt
 
+        # update selected boxes
+        if click_down_pos is not None:
+            mouse_pos_tile_lst = np.floor(game_pos).tolist()
+            if mouse_pos_tile_lst not in selected_boxes:
+                selected_boxes.append(mouse_pos_tile_lst)
+
         pygame.display.set_caption(f"fps: {fps}")
 
         screen.fill((255, 255, 255))
+
         world.display(screen)
+
+        # display the selected boxes
+        for pos in selected_boxes:
+            pos2 = -world.camera_pos + (pos[0] * tile_size, pos[1]* tile_size) + half_screen
+            rect = pygame.Rect(pos2, (tile_size, tile_size))
+            pygame.draw.rect(screen, (0, 0, 255), rect, 5)
+
         pygame.display.flip()
 
 
